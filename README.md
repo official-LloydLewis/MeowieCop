@@ -1,5 +1,3 @@
-Here’s a cleaner, more professional, bilingual README with emojis, a feature table, and language navigation sections for both English and Persian.
-
 ---
 
 # 🐾 MeowieCop v1.9.0
