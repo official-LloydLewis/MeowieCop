@@ -1,14 +1,14 @@
 ---
 
-# 🐾 MeowieCop v1.9.0
+# 🐾 MeowieCop v2.0.0
 
 <div align="center">
 
-Lightweight moderation helper bot for **Bale** group chats
-Built for practical moderation workflows, persistent storage, and automated admin utilities.
+Lightweight moderation helper bot for **Bale** group chats  
+Now upgraded with safer storage, better performance, timed moderation, and smarter command targeting.
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
-![Version](https://img.shields.io/badge/Version-1.9.0-green)
+![Version](https://img.shields.io/badge/Version-2.0.0-green)
 ![Platform](https://img.shields.io/badge/Platform-Bale-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
@@ -31,32 +31,35 @@ Built for practical moderation workflows, persistent storage, and automated admi
 
 **MeowieCop** is a lightweight moderation assistant bot for **Bale** group chats.
 
-It provides practical administration tools including:
+Compared to **v1.9.0**, the **v2.0.0 generation** (including `V2.1.0` and `V2.2.0`) introduces stronger reliability and moderation quality:
 
-* 🔨 Reply-based banning system
-* 🔇 Mute / unmute moderation
-* 💾 Persistent YAML storage
-* 🚫 Automatic re-ban for blacklisted users
-* 📜 Polling architecture with readable logs
+* 🔒 Atomic YAML write flow to reduce data corruption risk
+* ⏱️ Timed mute support (`10min`, `2h`, `3d`, `1w`) + background expiry handling
+* 🧠 Better target resolution (reply, mention entities, username lookup, prefix matching)
+* 🧵 Thread-safe cache/database access with locks and background workers
+* 🚦 API resilience improvements (retry/backoff, rate-limit handling, pooled HTTP session)
+* 📚 Expanded command aliases in Persian and English
 
 Current implementation is located in:
 
 ```text
-v1.9.0/MeowieHelper.py
+v2.0.0/V2.2.0/MoewieCop.py
 ```
 
 ---
 
 # ✨ Features
 
-| Feature               | Description                                           |
-| --------------------- | ----------------------------------------------------- |
-| 🔨 Ban / Unban        | Reply-based moderation commands for banning users     |
-| 🔇 Mute / Unmute      | Silence users temporarily or permanently              |
-| 💾 Persistent Storage | Saves moderation data using YAML files                |
-| 🚫 Auto Re-ban        | Automatically bans blacklisted users when they rejoin |
-| ⏰ Auto Unmute Checker | Background checker prepared for timed mutes           |
-| 📜 Logging            | Clear startup and runtime console logs                |
+| Feature                       | Description                                                              |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| 🔨 Ban / Unban                | Reply or mention-based moderation commands for banning users             |
+| 🔇 Timed & Permanent Mute     | Mute users for specific durations or indefinitely                        |
+| 💾 Unified Persistent Storage | Stores users, muted users, and blacklist in one YAML database            |
+| 🚫 Auto Re-ban                | Automatically bans blacklisted users when they rejoin                    |
+| 🧭 Smart User Resolution      | Resolves users via reply, mention entities, cached usernames, and prefix |
+| 🔁 Resilient API Calls        | Handles transient failures, 429 rate limits, and server retries          |
+| ⚙️ Background Workers         | Periodic mute expiration checks and deferred cache-to-database flushing  |
+| 📜 Structured Logging         | Thread-aware logs for startup and runtime observability                  |
 
 ---
 
@@ -66,10 +69,15 @@ v1.9.0/MeowieHelper.py
 .
 ├── LICENSE
 ├── README.md
-└── v1.9.0/
-    ├── MeowieHelper.py
-    ├── blacklist.yml
-    └── database.yml
+├── v1.9.0/
+│   ├── MeowieHelper.py
+│   ├── blacklist.yml
+│   └── database.yml
+└── v2.0.0/
+    ├── V2.1.0/
+    │   └── MoewieCop.py
+    └── V2.2.0/
+        └── MoewieCop.py
 ```
 
 ---
@@ -93,7 +101,7 @@ pip install requests pyyaml
 
 # 🔧 Configuration
 
-The bot reads configuration from constants and environment variables inside `MeowieHelper.py`.
+The bot reads configuration from constants and environment variables inside `MoewieCop.py`.
 
 ## 🔑 Required Environment Variable
 
@@ -107,12 +115,12 @@ export BOT_TOKEN="your_bale_bot_token"
 
 # 📂 Important Files
 
-| File            | Purpose             |
-| --------------- | ------------------- |
-| `database.yml`  | Stores muted users  |
-| `blacklist.yml` | Stores banned users |
+| File                         | Purpose                                                |
+| ---------------------------- | ------------------------------------------------------ |
+| `v2.0.0/V2.2.0/MoewieCop.py`| Current stable implementation                           |
+| `database.yml`              | Unified runtime database (users, muted, blacklist data)|
 
-Run the bot from inside the `v1.9.0` directory so relative paths resolve correctly.
+Run the bot from inside the chosen version directory so relative paths resolve correctly.
 
 ---
 
@@ -121,11 +129,11 @@ Run the bot from inside the `v1.9.0` directory so relative paths resolve correct
 From repository root:
 
 ```bash
-cd v1.9.0
-python MeowieHelper.py
+cd v2.0.0/V2.2.0
+python MoewieCop.py
 ```
 
-You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
+You should see startup logs and the **MeowieCop 2.x** banner in the console.
 
 ---
 
@@ -133,10 +141,12 @@ You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
 
 ## 🔨 Ban Commands
 
-| Persian | English |
-| ------- | ------- |
-| `بن`    | `ban`   |
-| `سیک`   | `ban`   |
+| Persian       | English |
+| ------------- | ------- |
+| `بن`          | `ban`   |
+| `سیک`         | `ban`   |
+| `گمشو بیرون`  | `ban`   |
+| `اخراج`       | `ban`   |
 
 ---
 
@@ -145,6 +155,7 @@ You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
 | Persian | English |
 | ------- | ------- |
 | `انبن`  | `unban` |
+| `آنبن`  | `unban` |
 
 ---
 
@@ -153,6 +164,15 @@ You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
 | Persian | English |
 | ------- | ------- |
 | `سکوت`  | `mute`  |
+| `میوت`  | `mute`  |
+| `خفه`   | `mute`  |
+
+Timed examples:
+
+```text
+mute @username 10min
+سکوت @username 2h
+```
 
 ---
 
@@ -162,6 +182,8 @@ You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
 | -------------- | -------- |
 | `بازکردن سکوت` | `unmute` |
 | `رفع سکوت`     | `unmute` |
+| `آزاد`         | `unmute` |
+| `ازاد`         | `unmute` |
 
 ---
 
@@ -172,16 +194,17 @@ You should see startup logs and the **MeowieCop v1.9.0** banner in the console.
 | `راهنما` | `info`  |
 | `-info`  | `info`  |
 
-> ⚠️ Most moderation actions are reply-based and require replying to a target user's message.
+> ⚠️ Moderation actions support reply-based and mention-based targeting.
 
 ---
 
 # 🚀 Production Notes
 
 * 🔐 Keep `BOT_TOKEN` secret
-* 🐳 Consider using Docker or a process manager
-* 📜 Enable log rotation for long-running bots
-* 💾 Back up YAML files regularly
+* 🧠 Prefer `V2.2.0` for current production use
+* 🗂️ Back up `database.yml` regularly
+* 📈 Tune env-based limits (`RATE_LIMIT_PER_SEC`, `USER_CACHE_MAX_SIZE`, etc.) for large groups
+* 🧪 Test timed mute flows in a staging group before rollout
 
 ---
 
@@ -195,34 +218,37 @@ This project is distributed under the terms of the license in [`LICENSE`](./LICE
 
 ## 📌 معرفی
 
-**MeowieCop** یک ربات سبک مدیریت گروه برای پیام‌رسان **بله** است که برای مدیریت عملی گروه‌ها طراحی شده است.
+**MeowieCop** یک ربات سبک مدیریت گروه برای پیام‌رسان **بله** است.
 
-امکانات اصلی:
+نسخه‌های **۲.۰.۰** (شامل `V2.1.0` و `V2.2.0`) نسبت به **۱.۹.۰** بهبودهای مهمی دارند:
 
-* 🔨 سیستم بن و آنبن بر پایه ریپلای
-* 🔇 میوت و آن‌میوت کاربران
-* 💾 ذخیره‌سازی دائمی با YAML
-* 🚫 بن خودکار کاربران بلک‌لیست‌شده
-* 📜 لاگ‌گیری واضح و معماری Polling
+* 🔒 ذخیره‌سازی اتمیک YAML برای کاهش ریسک خراب‌شدن دیتابیس
+* ⏱️ میوت زمان‌دار (`10min`، `2h`، `3d`، `1w`) همراه با بررسی خودکار پایان میوت
+* 🧠 پیدا کردن هوشمند کاربر هدف از طریق ریپلای، منشن و کش کاربران
+* 🧵 امنیت همزمانی بهتر با Lock و Workerهای پس‌زمینه
+* 🚦 ارتباط پایدارتر با API (Retry/Backoff/Rate-limit handling)
+* 📚 دستورات بیشتر به فارسی و انگلیسی
 
-فایل اصلی پروژه:
+فایل اصلی نسخه فعلی:
 
 ```text
-v1.9.0/MeowieHelper.py
+v2.0.0/V2.2.0/MoewieCop.py
 ```
 
 ---
 
 # ✨ امکانات
 
-| قابلیت              | توضیح                                   |
-| ------------------- | --------------------------------------- |
-| 🔨 بن / آنبن        | مدیریت کاربران با دستورات ریپلای        |
-| 🔇 سکوت / رفع سکوت  | میوت و آن‌میوت کاربران                  |
-| 💾 ذخیره‌سازی دائمی | ذخیره اطلاعات در فایل‌های YAML          |
-| 🚫 بن خودکار        | بن مجدد کاربران بلک‌لیست‌شده هنگام ورود |
-| ⏰ بررسی خودکار سکوت | ساختار آماده برای میوت زمان‌دار         |
-| 📜 لاگ‌گیری         | لاگ‌های واضح هنگام اجرا                 |
+| قابلیت                   | توضیح                                                         |
+| ------------------------ | ------------------------------------------------------------- |
+| 🔨 بن / آنبن             | مدیریت کاربران با ریپلای یا منشن                              |
+| 🔇 سکوت زمان‌دار و دائم   | میوت برای زمان مشخص یا نامحدود                                |
+| 💾 ذخیره‌سازی یکپارچه     | نگهداری users / muted / blacklist در یک دیتابیس YAML          |
+| 🚫 بن خودکار             | بن مجدد کاربران بلک‌لیست‌شده هنگام ورود مجدد                  |
+| 🧭 تشخیص هوشمند کاربر هدف | تشخیص با ریپلای، منشن، کش و Prefix Match                      |
+| 🔁 API مقاوم             | مدیریت خطاهای موقت، 429 و Retry سمت سرور                      |
+| ⚙️ Worker پس‌زمینه       | بررسی پایان میوت و Flush دوره‌ای کش کاربران به دیتابیس        |
+| 📜 لاگ‌گیری ساختاریافته  | لاگ‌های دقیق با نمایش Thread برای عیب‌یابی بهتر               |
 
 ---
 
@@ -232,10 +258,15 @@ v1.9.0/MeowieHelper.py
 .
 ├── LICENSE
 ├── README.md
-└── v1.9.0/
-    ├── MeowieHelper.py
-    ├── blacklist.yml
-    └── database.yml
+├── v1.9.0/
+│   ├── MeowieHelper.py
+│   ├── blacklist.yml
+│   └── database.yml
+└── v2.0.0/
+    ├── V2.1.0/
+    │   └── MoewieCop.py
+    └── V2.2.0/
+        └── MoewieCop.py
 ```
 
 ---
@@ -259,7 +290,7 @@ pip install requests pyyaml
 
 # 🔧 تنظیمات
 
-ربات تنظیمات را از متغیرهای محیطی و ثابت‌های داخل `MeowieHelper.py` می‌خواند.
+ربات تنظیمات را از ثابت‌ها و متغیرهای محیطی داخل `MoewieCop.py` می‌خواند.
 
 ## 🔑 متغیر ضروری
 
@@ -276,34 +307,35 @@ export BOT_TOKEN="your_bale_bot_token"
 از ریشه پروژه:
 
 ```bash
-cd v1.9.0
-python MeowieHelper.py
+cd v2.0.0/V2.2.0
+python MoewieCop.py
 ```
 
-پس از اجرا، لاگ‌های شروع و بنر **MeowieCop v1.9.0** نمایش داده می‌شود.
+بعد از اجرا، لاگ‌های شروع و بنر **MeowieCop 2.x** نمایش داده می‌شود.
 
 ---
 
 # 🛠️ دستورات مدیریتی
 
-| عملیات      | دستورات                                |
-| ----------- | -------------------------------------- |
-| 🔨 بن       | `بن` / `سیک` / `ban`                   |
-| 🔓 آنبن     | `انبن` / `unban`                       |
-| 🔇 سکوت     | `سکوت` / `mute`                        |
-| 🔊 رفع سکوت | `بازکردن سکوت` / `رفع سکوت` / `unmute` |
-| ℹ️ راهنما   | `راهنما` / `info` / `-info`            |
+| عملیات      | دستورات                                                       |
+| ----------- | ------------------------------------------------------------- |
+| 🔨 بن       | `بن` / `سیک` / `گمشو بیرون` / `اخراج` / `ban`                |
+| 🔓 آنبن     | `انبن` / `آنبن` / `unban`                                     |
+| 🔇 سکوت     | `سکوت` / `میوت` / `خفه` / `mute` (+ زمان مثل `10min`, `2h`) |
+| 🔊 رفع سکوت | `بازکردن سکوت` / `رفع سکوت` / `آزاد` / `ازاد` / `unmute`    |
+| ℹ️ راهنما   | `راهنما` / `info` / `-info`                                  |
 
-> ⚠️ بیشتر دستورات مدیریتی به صورت ریپلای روی پیام کاربر استفاده می‌شوند.
+> ⚠️ دستورات مدیریتی هم به صورت ریپلای و هم منشن پشتیبانی می‌شوند.
 
 ---
 
 # 🚀 نکات استفاده در محیط واقعی
 
 * 🔐 توکن ربات را مخفی نگه دارید
-* 🐳 استفاده از Docker یا Process Manager پیشنهاد می‌شود
-* 📜 برای لاگ‌ها Log Rotation تنظیم کنید
-* 💾 از فایل‌های YAML بکاپ بگیرید
+* 🧠 برای استفاده عملی، نسخه `V2.2.0` پیشنهاد می‌شود
+* 💾 از `database.yml` بکاپ منظم بگیرید
+* 📈 برای گروه‌های بزرگ، مقادیر محدودیت کش و Rate Limit را تنظیم کنید
+* 🧪 قبل از اجرا در گروه اصلی، میوت زمان‌دار را در گروه تست بررسی کنید
 
 ---
 
