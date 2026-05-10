@@ -1,7 +1,0 @@
-start: "🤖 بات MoewieCop فعال شد."
-help: "📘 برای مشاهده دستورات از /info استفاده کنید."
-muted: "🔇 کاربر {target} توسط {admin} برای {duration} سکوت شد."
-unmuted: "🔊 سکوت کاربر {target} توسط {admin} برداشته شد."
-banned: "⛔ کاربر {target} توسط {admin} بن شد."
-unbanned: "✅ کاربر {target} توسط {admin} آنبن شد."
-not_admin: "⚠️ فقط مدیران می‌توانند این دستور را اجرا کنند."
